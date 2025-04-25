@@ -11,39 +11,42 @@ int WinMain(int argc, char ** argv)
     int spawnFrequency = 200;
     int spawnCount = 0;
     int timeInterval = 100;
-    srand(time(0));
+    srand(static_cast<unsigned int>(time(0)));
     //int size;
     //Uint32 RGB;
-	CatTracker game(screen);
-	for(int i = 0; i < 5; i++)
-		game.tryAddMole();
-	screen.update();
-	for(int i = 0; i < 1000; i++){
-		for(int j = 801; j <1000; j++){
-			screen.plotPixel(i, j, 0, 0, 0);
-		}
-	}
+    CatTracker game(screen);
+    for(int i = 0; i < 5; i++)
+        game.tryAddMole();
+    screen.update();
+    for(int i = 0; i < 1000; i++){
+        for(int j = 801; j <1000; j++){
+            screen.plotPixel(i, j, 0, 0, 0);
+        }
+    }
     while (!screen.getQuit() && game.getLives() > 0)
     {
+        if(screen.mouseClick()){
+            pointClicked = screen.getMouseClick();
+            game.checkKills(pointClicked);
+        }
 
-		if(screen.mouseClick()){
-			pointClicked = screen.getMouseClick();
-			game.checkKills(pointClicked);
-		}
-		game.update();
-		game.checkTimeouts();
-		if(spawnCount > spawnFrequency){
-			game.tryAddMole();
-			spawnFrequency -= random(1, 10);
-			spawnCount = 0;
-		}
-		else{
-			spawnCount += random(1, 10);
-		}
-		screen.update();
-		screen.Sleep(timeInterval);
+        game.update();
+        game.checkTimeouts();
 
+        if(spawnCount > spawnFrequency){
+            game.tryAddMole();
+            spawnFrequency -= random(1, 10);
+            spawnCount = 0;
+        } else {
+            spawnCount += random(1, 10);
+        }
 
+        game.drawScoreboard();
+        game.drawLivesBoard();
+        game.update();
+
+        screen.update();
+        screen.Sleep(timeInterval);
     }
     cout << game.getScore() << endl;
     return 0;
